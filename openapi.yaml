@@ -67,7 +67,7 @@ paths:
             type: string
         - name: X-Ai-Folder
           in: header
-          description: 'The directory in which the AI ​​model is located. Required if aiProvider=yandex'
+          description: 'The directory in which the AI model is located. Required if aiProvider=yandex'
           required: false
           schema:
             type: string

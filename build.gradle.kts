@@ -55,7 +55,6 @@ dependencies {
     // Features
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation-jvm:$ktor_version")
-    implementation("io.ktor:ktor-server-resources-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-auth-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
 

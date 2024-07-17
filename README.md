@@ -1,5 +1,5 @@
-Quiz Platform API
-=============
+Quiz-Platform API
+=================
 
 Quiz Platform is a Open Source knowledge testing platform for mobile apps.
 
@@ -11,8 +11,9 @@ Quiz Platform is a Open Source knowledge testing platform for mobile apps.
 
 # Stack
 
+* Framework: Ktor
 * Language: Kotlin
-* Architecture: clean
+* Architecture: Clean
 * Threading: Coroutines + Flow
 * DI: Koin
 * DB: Exposed

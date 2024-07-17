@@ -1,0 +1,166 @@
+openapi: 3.1.0
+
+info:
+  title: Quiz-Platform API
+  description: |-
+    The Quiz-Platform API provides access to the Unified State Exam/Overview codifier and generates theory for topics based on the Yandex GPT API.
+  termsOfService: https://yugyd.com/terms/
+  contact:
+    email: yugydyur@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+
+servers:
+  - url: https://quizplatform.yugyd.com/api/v1
+
+tags:
+  - name: theme
+    description: Topic data
+
+paths:
+  /theme/themes:
+    post:
+      tags:
+        - theme
+      summary: List of topics
+      description: Return a list of topics by subject
+      operationId: getThemes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThemeRequestBody'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Theme'
+        '400':
+          description: Invalid content
+        '404':
+          description: Themes not found
+
+  /theme/detail/{themeId}:
+    get:
+      tags:
+        - theme
+      summary: Topic details
+      description: Return topic by ID
+      operationId: getThemesById
+      parameters:
+        - name: themeId
+          in: path
+          description: The topic ID to get
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: X-Ai-Key
+          in: header
+          description: 'AI API access key'
+          required: false
+          schema:
+            type: string
+        - name: X-Ai-Folder
+          in: header
+          description: 'The directory in which the AI ​​model is located. Required if aiProvider=yandex'
+          required: false
+          schema:
+            type: string
+        - name: X-Ai-Provider
+          in: header
+          description: 'Provider that provides access to AI'
+          required: false
+          schema:
+            type: string
+            enum:
+              - yandex
+              - openai
+        - name: recreate
+          in: query
+          description: 'Generate new content via AI or return cached content'
+          required: false
+          schema:
+            type: boolean
+            examples: [ false ]
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThemeDetail'
+        '404':
+          description: Theme not found
+components:
+  schemas:
+    ThemeRequestBody:
+      type: object
+      properties:
+        content:
+          type: string
+          description: Content type
+          examples: [ biology ]
+          enum:
+            - biology
+            - history
+    Theme:
+      type: object
+      required:
+        - id
+        - name
+        - description
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples: [ 1 ]
+        name:
+          type: string
+          examples: [ Antiquity and Middle Ages ]
+        description:
+          type: string
+          examples: [ The formation of feudal power ]
+        iconUrl:
+          type: string
+          examples: [ yugyd.com/test.png ]
+        detail:
+          type: boolean
+          examples: [ true ]
+    ThemeDetail:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - content
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples: [ 1 ]
+        name:
+          type: string
+          examples: [ Antiquity and Middle Ages ]
+        description:
+          type: string
+          examples: [ The formation of feudal power ]
+        iconUrl:
+          type: string
+          examples: [ yugyd.com/test.png ]
+        detail:
+          type: boolean
+          examples: [ true ]
+        content:
+          type: string
+          description: Content in MD format
+          examples: [ MD content ]
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header

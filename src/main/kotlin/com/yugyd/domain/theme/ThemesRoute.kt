@@ -41,13 +41,13 @@ internal fun Route.postThemes(themeService: ThemeService) {
             call.respond(HttpStatusCode.OK, themes)
         } catch (error: IllegalArgumentException) {
             error.printStackTrace()
-            call.respond(HttpStatusCode.BadRequest)
+            call.respond(HttpStatusCode.InternalServerError)
         } catch (error: IllegalStateException) {
             error.printStackTrace()
-            call.respond(HttpStatusCode.BadRequest)
+            call.respond(HttpStatusCode.InternalServerError)
         } catch (error: JsonConvertException) {
             error.printStackTrace()
-            call.respond(HttpStatusCode.BadRequest)
+            call.respond(HttpStatusCode.InternalServerError)
         }
     }
 }

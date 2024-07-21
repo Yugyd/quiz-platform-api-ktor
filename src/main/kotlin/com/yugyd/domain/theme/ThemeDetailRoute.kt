@@ -46,10 +46,13 @@ internal fun Route.getThemeDetail(
             call.respond(HttpStatusCode.OK, theme)
         } catch (error: IllegalArgumentException) {
             error.printStackTrace()
-            call.respond(HttpStatusCode.BadRequest)
+            call.respond(HttpStatusCode.InternalServerError)
+        } catch (error: IllegalStateException) {
+            error.printStackTrace()
+            call.respond(HttpStatusCode.InternalServerError)
         } catch (error: JsonConvertException) {
             error.printStackTrace()
-            call.respond(HttpStatusCode.BadRequest)
+            call.respond(HttpStatusCode.InternalServerError)
         }
     }
 }

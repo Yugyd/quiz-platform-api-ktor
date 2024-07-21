@@ -3,13 +3,13 @@ openapi: 3.1.0
 info:
   title: Quiz-Platform API
   description: |-
-    The Quiz-Platform API provides access to the Unified State Exam/Overview codifier and generates theory for topics based on the Yandex GPT API.
+    The Quiz-Platform API provides access to the Unified State Exam/Overview codifier and generates theory for themes based on the Yandex GPT API.
   termsOfService: https://yugyd.com/terms/
   contact:
     email: yugydyur@gmail.com
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    url: https://github.com/Yugyd/quiz-platform-api-ktor/blob/main/LICENSE.txt
   version: 1.0.0
 
 servers:
@@ -17,15 +17,15 @@ servers:
 
 tags:
   - name: theme
-    description: Topic data
+    description: Theme data
 
 paths:
   /theme/themes:
     post:
       tags:
         - theme
-      summary: List of topics
-      description: Return a list of topics by subject
+      summary: List of themes
+      description: Return a list of themes by subject
       operationId: getThemes
       requestBody:
         content:
@@ -34,52 +34,36 @@ paths:
               $ref: '#/components/schemas/ThemeRequestBody'
       responses:
         '200':
-          description: successful operation
+          description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Theme'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Theme'
         '400':
-          description: Invalid content
+          description: Invalid content field
         '404':
           description: Themes not found
+        '500':
+          description: Internal server error. Example, failed to retrieve data
 
   /theme/detail/{themeId}:
     get:
       tags:
         - theme
-      summary: Topic details
-      description: Return topic by ID
+      summary: Theme details
+      description: Return theme by ID
       operationId: getThemesById
       parameters:
         - name: themeId
           in: path
-          description: The topic ID to get
+          description: The theme ID to get
           required: true
           schema:
             type: integer
             format: int64
-        - name: X-Ai-Key
-          in: header
-          description: 'AI API access key'
-          required: false
-          schema:
-            type: string
-        - name: X-Ai-Folder
-          in: header
-          description: 'The directory in which the AI model is located. Required if aiProvider=yandex'
-          required: false
-          schema:
-            type: string
-        - name: X-Ai-Provider
-          in: header
-          description: 'Provider that provides access to AI'
-          required: false
-          schema:
-            type: string
-            enum:
-              - yandex
-              - openai
+            examples: [ 1 ]
         - name: recreate
           in: query
           description: 'Generate new content via AI or return cached content'
@@ -87,33 +71,68 @@ paths:
           schema:
             type: boolean
             examples: [ false ]
+        - name: X-Ai-Key
+          in: header
+          description: 'AI API access key. Required if recreate=true'
+          required: false
+          schema:
+            type: string
+        - name: X-Ai-Folder
+          in: header
+          description: 'The directory in which the AI model is located. Required if recreate=true and aiProvider=yandex'
+          required: false
+          schema:
+            type: string
+        - name: X-Ai-Provider
+          in: header
+          description: 'Provider that provides access to AI. Required if recreate=true'
+          required: false
+          schema:
+            type: string
+            enum:
+              - yandex
+              - openai
+            examples: [ "yandex" ]
       responses:
         '200':
-          description: successful operation
+          description: Successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ThemeDetail'
+        '400':
+          description: Invalid themeId field
         '404':
           description: Theme not found
+        '500':
+          description: Internal server error. Example, failed to retrieve data
+
 components:
   schemas:
     ThemeRequestBody:
       type: object
+      required:
+        - content
       properties:
         content:
           type: string
           description: Content type
-          examples: [ biology ]
+          examples: [ history ]
           enum:
-            - biology
             - history
+        parentThemeId:
+          type: string
+          format: int64
+          description: Parent theme id
+          examples: [ 1 ]
+
     Theme:
       type: object
       required:
         - id
         - name
         - description
+        - detail
       properties:
         id:
           type: integer
@@ -127,7 +146,7 @@ components:
           examples: [ The formation of feudal power ]
         iconUrl:
           type: string
-          examples: [ yugyd.com/test.png ]
+          examples: [ https://yugyd.com/test.png ]
         detail:
           type: boolean
           examples: [ true ]
@@ -137,6 +156,7 @@ components:
         - id
         - name
         - description
+        - detail
         - content
       properties:
         id:
@@ -151,7 +171,7 @@ components:
           examples: [ The formation of feudal power ]
         iconUrl:
           type: string
-          examples: [ yugyd.com/test.png ]
+          examples: [ https://yugyd.com/test.png ]
         detail:
           type: boolean
           examples: [ true ]
@@ -159,6 +179,7 @@ components:
           type: string
           description: Content in MD format
           examples: [ MD content ]
+
   securitySchemes:
     api_key:
       type: apiKey

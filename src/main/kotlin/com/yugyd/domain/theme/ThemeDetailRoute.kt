@@ -9,9 +9,9 @@ import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
-import org.koin.mp.KoinPlatform.getKoin
 
 internal fun Route.getThemeDetail(
+    aiKeysFactory: AiKeysFactory,
     themeService: ThemeService,
 ) {
     get(path = "/detail/{themeId}") {
@@ -30,7 +30,6 @@ internal fun Route.getThemeDetail(
                 aiProvider = call.request.headers["X-Ai-Provider"],
             )
 
-            val aiKeysFactory = getKoin().get<AiKeysFactory>()
             val aiKeys = aiKeysFactory.create(aiAuthModel)
 
             val theme = themeService.getThemeDetail(

@@ -80,6 +80,8 @@ dependencies {
     implementation("io.insert-koin:koin-ktor")
 
     // Test
+    testImplementation("io.insert-koin:koin-test")
+    testImplementation("io.insert-koin:koin-test-junit4")
     testImplementation("io.mockk:mockk:$mockk_version")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")

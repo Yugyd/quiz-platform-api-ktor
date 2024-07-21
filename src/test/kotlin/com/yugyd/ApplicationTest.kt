@@ -1,10 +1,16 @@
 package com.yugyd
 
-import com.yugyd.data.themes.ThemesRepository
+import com.yugyd.app.configureErrorHandling
+import com.yugyd.app.configureRouting
+import com.yugyd.app.configureSerialization
+import com.yugyd.core.serializationCoreModule
+import com.yugyd.domain.ai.factory.AiKeysFactory
+import com.yugyd.domain.ai.factory.AiKeysFactoryImpl
 import com.yugyd.domain.content.models.ContentModel
 import com.yugyd.domain.theme.models.details.ThemeDetailModel
 import com.yugyd.domain.theme.models.list.ThemeListModel
 import com.yugyd.domain.theme.models.list.ThemesRequestModel
+import com.yugyd.domain.theme.service.ThemeService
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
@@ -19,25 +25,43 @@ import io.ktor.server.application.Application
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
+import org.junit.Rule
+import org.koin.dsl.module
+import org.koin.test.KoinTest
+import org.koin.test.KoinTestRule
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ApplicationTest {
-
-    private lateinit var themesRepository: ThemesRepository
+class ApplicationTest : KoinTest {
 
     private val testContent = ContentModel.HISTORY
     private val testThemeId = 1
     private val testNotExistsThemeId = -1
     private val testParentThemeId = 2
 
+    private lateinit var aiKeysFactory: AiKeysFactory
+
+    private lateinit var themeService: ThemeService
+
+    @get:Rule
+    val koinTestRule = KoinTestRule.create {
+        modules(
+            serializationCoreModule,
+            module {
+                single<AiKeysFactory> { aiKeysFactory }
+                single<ThemeService> { themeService }
+            },
+        )
+    }
+
     @BeforeTest
     fun setup() {
-        themesRepository = mockk()
+        aiKeysFactory = AiKeysFactoryImpl()
 
+        themeService = mockk<ThemeService>()
         coEvery {
-            themesRepository.getThemes(testContent)
+            themeService.getThemes(testContent)
         } returns listOf(
             ThemeListModel(
                 id = 1,
@@ -49,7 +73,7 @@ class ApplicationTest {
         )
 
         coEvery {
-            themesRepository.getThemes(testContent, testParentThemeId)
+            themeService.getThemes(testContent, testParentThemeId)
         } returns listOf(
             ThemeListModel(
                 id = 2,
@@ -61,7 +85,7 @@ class ApplicationTest {
         )
 
         coEvery {
-            themesRepository.getThemeDetail(testThemeId)
+            themeService.getThemeDetail(testThemeId)
         } returns ThemeDetailModel(
             id = 1,
             name = "Test Title",
@@ -72,15 +96,8 @@ class ApplicationTest {
         )
 
         coEvery {
-            themesRepository.getThemeDetail(testNotExistsThemeId)
+            themeService.getThemeDetail(testNotExistsThemeId)
         } returns null
-    }
-
-    private fun Application.testModule() {
-//        configureSerialization()
-//        configureDatabases(themesRepository, Json)
-//        configureErrorHandling()
-//        configureRouting(themesRepository)
     }
 
     @Test
@@ -122,17 +139,16 @@ class ApplicationTest {
                 json()
             }
         }
-        val themeId = 1
 
         // When
-        val response = client.get("/theme/detail/$themeId")
+        val response = client.get("/theme/detail/$testThemeId")
 
         // Then
         val body = response.body<ThemeDetailModel>()
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals(
             body,
-            themesRepository.getThemeDetail(themeId)
+            themeService.getThemeDetail(testThemeId)
         )
     }
 
@@ -147,8 +163,8 @@ class ApplicationTest {
             }
         }
         val request = ThemesRequestModel(
-            content = ContentModel.HISTORY.serverValue,
-            parentThemeId = 2,
+            content = testContent.serverValue,
+            parentThemeId = testParentThemeId,
         )
 
         // When
@@ -164,7 +180,13 @@ class ApplicationTest {
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals(
             response.body<List<ThemeListModel>>(),
-            themesRepository.getThemes(ContentModel.HISTORY, request.parentThemeId!!)
+            themeService.getThemes(testContent, testParentThemeId)
         )
+    }
+
+    private fun Application.testModule() {
+        configureSerialization()
+        configureErrorHandling()
+        configureRouting()
     }
 }

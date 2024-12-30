@@ -1,0 +1,12 @@
+ktor:
+  application:
+    modules:
+      - com.yugyd.quiz.ApplicationKt.module
+  deployment:
+    port: "$PORT:8080"
+  environment: $?KTOR_ENV
+storage:
+  jdbcURL: "$DB_JDBC_URL:jdbc:postgresql://localhost:5432/themes"
+  user: "$DB_JDBC_USER:postgres"
+  password: "$DB_JDBC_PASSWORD:password"
+  driverClassName: "org.postgresql.Driver"

@@ -3,67 +3,154 @@ openapi: 3.1.0
 info:
   title: Quiz-Platform API
   description: |-
-    The Quiz-Platform API provides access to the Unified State Exam/Overview codifier and generates theory for themes based on the Yandex GPT API.
-  termsOfService: https://yugyd.com/terms/
+    The Quiz-Platform API provides access to the Unified State Exam/Overview codifier and generates theory for topics based on the Yandex GPT API.
+  termsOfService: https://www.yugyd.com/terms/
   contact:
     email: yugydyur@gmail.com
   license:
     name: Apache 2.0
-    url: https://github.com/Yugyd/quiz-platform-api-ktor/blob/main/LICENSE.txt
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
 
 servers:
-  - url: https://quizplatform.yugyd.com/api/v1
+  - url: https://www.yugyd.com/content/api/v1
 
 tags:
+  - name: tasks
+    description: Tasks data
   - name: theme
-    description: Theme data
+    description: Topic data
+  - name: content
+    description: Content database
 
 paths:
-  /theme/themes:
-    post:
+  /tasks/{themeId}:
+    get:
       tags:
-        - theme
-      summary: List of themes
-      description: Return a list of themes by subject
-      operationId: getThemes
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ThemeRequestBody'
+        - tasks
+      summary: List of tasks
+      description: Return a list of tasks by subject
+      operationId: getTasks
+      parameters:
+        - name: themeId
+          in: path
+          description: The topic ID to get
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/X-Ai-Key'
+        - $ref: '#/components/parameters/X-Ai-Folder'
+        - $ref: '#/components/parameters/X-Ai-Provider'
       responses:
         '200':
-          description: Successful operation
+          description: successful operation
+          headers:
+            Cache-Control:
+              description: Cache the theme details for 1 hour
+              schema:
+                type: string
+              example: "public, max-age=3600"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Theme'
+                  $ref: '#/components/schemas/Task'
         '400':
-          description: Invalid content field
+          description: Invalid content
+        '401':
+          description: Invalid credential for ai provider
         '404':
-          description: Themes not found
+          description: Tasks not generated
+        '429':
+          description: Too many requests
         '500':
-          description: Internal server error. Example, failed to retrieve data
-
-  /theme/detail/{themeId}:
+          description: Internal server error
+  /tasks/verification:
+    post:
+      tags:
+        - tasks
+      summary: Verify the answer
+      description: Return result a list of tasks by subject
+      operationId: verifyTask
+      parameters:
+        - $ref: '#/components/parameters/X-Ai-Key'
+        - $ref: '#/components/parameters/X-Ai-Folder'
+        - $ref: '#/components/parameters/X-Ai-Provider'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyTaskRequest'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyTask'
+        '400':
+          description: Invalid content
+        '401':
+          description: Invalid credential for ai provider
+        '404':
+          description: Task not found
+        '429':
+          description: Too many requests
+        '500':
+          description: Internal server error
+  /themes:
     get:
       tags:
         - theme
-      summary: Theme details
-      description: Return theme by ID
+      summary: List of topics
+      description: Return a list of topics by subject
+      operationId: getThemes
+      parameters:
+        - name: parentThemeId
+          in: query
+          description: The topic ID to get
+          nullable: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            Cache-Control:
+              description: Cache the themes for 1 hour
+              schema:
+                type: string
+              example: "public, max-age=3600"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Theme'
+        '400':
+          description: Invalid content
+        '404':
+          description: Themes not found
+        '429':
+          description: Too many requests
+        '500':
+          description: Internal server error
+  /themes/{themeId}:
+    get:
+      tags:
+        - theme
+      summary: Topic details
+      description: Return topic by ID
       operationId: getThemesById
       parameters:
         - name: themeId
           in: path
-          description: The theme ID to get
+          description: The topic ID to get
           required: true
           schema:
             type: integer
             format: int64
-            examples: [ 1 ]
         - name: recreate
           in: query
           description: 'Generate new content via AI or return cached content'
@@ -71,68 +158,236 @@ paths:
           schema:
             type: boolean
             examples: [ false ]
-        - name: X-Ai-Key
-          in: header
-          description: 'AI API access key. Required if recreate=true'
-          required: false
-          schema:
-            type: string
-        - name: X-Ai-Folder
-          in: header
-          description: 'The directory in which the AI model is located. Required if recreate=true and aiProvider=yandex'
-          required: false
-          schema:
-            type: string
-        - name: X-Ai-Provider
-          in: header
-          description: 'Provider that provides access to AI. Required if recreate=true'
-          required: false
-          schema:
-            type: string
-            enum:
-              - yandex
-              - openai
-            examples: [ "yandex" ]
+        - $ref: '#/components/parameters/X-Ai-Key'
+        - $ref: '#/components/parameters/X-Ai-Folder'
+        - $ref: '#/components/parameters/X-Ai-Provider'
       responses:
         '200':
-          description: Successful operation
+          description: successful operation
+          headers:
+            Cache-Control:
+              description: Cache the theme details for 1 hour
+              schema:
+                type: string
+              example: "public, max-age=3600"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ThemeDetail'
-        '400':
-          description: Invalid themeId field
+        '401':
+          description: Invalid credential for ai provider
         '404':
           description: Theme not found
+        '429':
+          description: Too many requests
         '500':
-          description: Internal server error. Example, failed to retrieve data
+          description: Internal server error
+  /content/database/{schemaVersion}:
+    get:
+      tags:
+        - content
+      summary: Get content database
+      description: Return content database
+      operationId: getContentDatabase
+      parameters:
+        - $ref: "#/components/parameters/SchemaVersion"
+        - $ref: "#/components/parameters/ContentVersion"
+      responses:
+        '200':
+          description: Successfully retrieved database file
+          headers:
+            Cache-Control:
+              description: Cache the database file for 1 hour
+              schema:
+                type: string
+              example: "public, max-age=3600"
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Content database not found
+        '429':
+          description: Too many requests
+        '500':
+          description: Internal server error
+    head:
+      tags:
+        - content
+      summary: Check availability of SQLite database file
+      description: Allows checking if the database file exists and retrieving its size before downloading.
+      operationId: headContentDatabase
+      parameters:
+        - $ref: "#/components/parameters/SchemaVersion"
+        - $ref: "#/components/parameters/ContentVersion"
+      responses:
+        '200':
+          description: Database file exists
+          headers:
+            Content-Length:
+              description: Size of the database file in bytes
+              schema:
+                type: integer
+                format: int64
+            Cache-Control:
+              description: Cache the database file for 1 hour
+              schema:
+                type: string
+              example: "public, max-age=3600"
+        '404':
+          description: Content database not found
+        '429':
+          description: Too many requests
+        '500':
+          description: Internal server error
 
 components:
+  parameters:
+    X-Ai-Key:
+      name: X-Ai-Key
+      in: header
+      description: 'AI API access key'
+      required: false
+      schema:
+        type: string
+    X-Ai-Folder:
+      name: X-Ai-Folder
+      in: header
+      description: 'The directory in which the AI model is located. Required if aiProvider=yandex'
+      required: false
+      schema:
+        type: string
+    X-Ai-Provider:
+      name: X-Ai-Provider
+      in: header
+      description: 'Provider that provides access to AI'
+      required: false
+      schema:
+        type: string
+        enum:
+          - yandex
+          - openai
+    SchemaVersion:
+      name: schemaVersion
+      in: path
+      description: The schema version of the content database
+      required: true
+      schema:
+        type: string
+        examples: [ 1.0.0 ]
+    ContentVersion:
+      name: contentVersion
+      in: query
+      description: The current version of the content
+      required: true
+      schema:
+        type: string
+        examples: [ 1.0.0 ]
+
   schemas:
-    ThemeRequestBody:
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of the quest
+        quest:
+          type: string
+          description: The main quest text
+        image:
+          type: string
+          description: URL of an image associated with the quest
+          nullable: true
+        true_answer:
+          type: string
+          description: The correct answer for the quest
+        answer2:
+          type: string
+          description: Alternative answer 2
+          nullable: true
+        answer3:
+          type: string
+          description: Alternative answer 3
+          nullable: true
+        answer4:
+          type: string
+          description: Alternative answer 4
+          nullable: true
+        answer5:
+          type: string
+          description: Alternative answer 5
+          nullable: true
+        answer6:
+          type: string
+          description: Alternative answer 6
+          nullable: true
+        answer7:
+          type: string
+          description: Alternative answer 7
+          nullable: true
+        answer8:
+          type: string
+          description: Alternative answer 8
+          nullable: true
+        complexity:
+          type: integer
+          description: Complexity level of the quest
+        category:
+          type: integer
+          description: Category ID of the quest
+        section:
+          type: integer
+          description: Section ID of the quest
+        type:
+          type: string
+          description: Type of the quest (e.g., "simple")
+          default: simple
+          enum:
+            - simple
+            - enter
+            - enter_with_hint
+            - select_manual
+            - select
+            - enter_ai
+            - select_bool
+    VerifyTaskRequest:
       type: object
       required:
-        - content
+        - quest
+        - userAnswer
+        - trueAnswer
       properties:
-        content:
+        quest:
           type: string
-          description: Content type
-          examples: [ history ]
-          enum:
-            - history
-        parentThemeId:
+          description: Quest value
+          examples: Quest?
+        userAnswer:
           type: string
-          format: int64
-          description: Parent theme id
-          examples: [ 1 ]
-
+          description: User answer value
+          examples: User answer
+        trueAnswer:
+          type: string
+          description: True answer value
+          examples: True answer
+    VerifyTask:
+      type: object
+      required:
+        - isCorrect
+        - aiDescription
+      properties:
+        isCorrect:
+          type: boolean
+          examples: [ true ]
+        aiDescription:
+          type: string
+          examples: Ai description
     Theme:
       type: object
       required:
         - id
         - name
         - description
-        - detail
       properties:
         id:
           type: integer
@@ -146,7 +401,7 @@ components:
           examples: [ The formation of feudal power ]
         iconUrl:
           type: string
-          examples: [ https://yugyd.com/test.png ]
+          examples: [ yugyd.com/test.png ]
         detail:
           type: boolean
           examples: [ true ]
@@ -156,7 +411,6 @@ components:
         - id
         - name
         - description
-        - detail
         - content
       properties:
         id:
@@ -171,7 +425,7 @@ components:
           examples: [ The formation of feudal power ]
         iconUrl:
           type: string
-          examples: [ https://yugyd.com/test.png ]
+          examples: [ yugyd.com/test.png ]
         detail:
           type: boolean
           examples: [ true ]
@@ -179,7 +433,6 @@ components:
           type: string
           description: Content in MD format
           examples: [ MD content ]
-
   securitySchemes:
     api_key:
       type: apiKey

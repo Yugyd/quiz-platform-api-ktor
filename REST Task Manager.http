@@ -1,31 +1,48 @@
-POST http://0.0.0.0:8080/theme/themes
+###
+@aiThemeId = 1
+
+GET http://0.0.0.0:8080/tasks/{{aiThemeId}}
 Accept: application/json
 Content-Type: application/json
+X-Ai-Key: REPLACE_ME
+X-Ai-Folder: REPLACE_ME
+X-Ai-Provider: yandex
+
+###
+POST http://0.0.0.0:8080/tasks/verification
+Accept: application/json
+Content-Type: application/json
+X-Ai-Key: REPLACE_ME
+X-Ai-Folder: REPLACE_ME
+X-Ai-Provider: yandex
 
 {
-  "content": "history"
+  "quest": "What is big?",
+  "trueAnswer": "Salmon",
+  "userAnswer": "Shark"
 }
 
 ###
-
-POST http://0.0.0.0:8080/theme/themes
+GET http://0.0.0.0:8080/themes
 Accept: application/json
 Content-Type: application/json
 
-{
-  "content": "history",
-  "parentThemeId": 1
-}
+###
+@parentThemeId = 1
+
+GET http://0.0.0.0:8080/themes?parentThemeId={{parentThemeId}}
+Accept: application/json
+Content-Type: application/json
 
 ###
 @themeId = 1
 
-GET http://0.0.0.0:8080/theme/detail/{{themeId}}?recreate=false
+GET http://0.0.0.0:8080/themes/{{themeId}}?recreate=false
 Accept: application/json
 Content-Type: application/json
 
 ###
-GET http://0.0.0.0:8080/theme/detail/{{themeId}}?recreate=true
+GET http://0.0.0.0:8080/themes/{{themeId}}?recreate=true
 Accept: application/json
 Content-Type: application/json
 X-Ai-Key: REPLACE_ME

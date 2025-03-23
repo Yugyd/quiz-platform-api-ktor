@@ -22,9 +22,9 @@ internal class ThemeDatabase(
         }
     }
 
-    suspend fun getThemes(): List<ThemeModel> {
+    suspend fun getMainThemes(): List<ThemeModel> {
         return newSuspendedTransaction(dispatchersProvider.io) {
-            ThemeDAO.all().map(themeEntityMapper::map)
+            ThemeDAO.find { ThemesTable.parentId.isNull() }.map(themeEntityMapper::map)
         }
     }
 

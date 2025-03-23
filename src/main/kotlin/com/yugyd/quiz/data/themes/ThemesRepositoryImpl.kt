@@ -23,7 +23,7 @@ internal class ThemesRepositoryImpl(
     override suspend fun getThemes(
         content: ContentModel,
     ): List<ThemeListModel> {
-        return themeDatabase.getThemes().map(themeMapper::mapToListModel)
+        return themeDatabase.getMainThemes().map(themeMapper::mapToListModel)
     }
 
     override suspend fun getThemes(

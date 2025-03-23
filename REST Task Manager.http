@@ -1,5 +1,5 @@
 ###
-@aiThemeId = 1
+@aiThemeId = 2
 
 GET http://0.0.0.0:8080/tasks/{{aiThemeId}}
 Accept: application/json
@@ -17,9 +17,9 @@ X-Ai-Folder: REPLACE_ME
 X-Ai-Provider: yandex
 
 {
-  "quest": "What is big?",
-  "trueAnswer": "Salmon",
-  "userAnswer": "Shark"
+  "quest": "What is the capital of France??",
+  "trueAnswer": "Paris",
+  "userAnswer": "Berlin"
 }
 
 ###
@@ -35,11 +35,14 @@ Accept: application/json
 Content-Type: application/json
 
 ###
-@themeId = 1
+@themeId = 2
 
 GET http://0.0.0.0:8080/themes/{{themeId}}?recreate=false
 Accept: application/json
 Content-Type: application/json
+X-Ai-Key: REPLACE_ME
+X-Ai-Folder: REPLACE_ME
+X-Ai-Provider: yandex
 
 ###
 GET http://0.0.0.0:8080/themes/{{themeId}}?recreate=true

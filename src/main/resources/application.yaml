@@ -10,3 +10,8 @@ storage:
   user: "$DB_JDBC_USER:postgres"
   password: "$DB_JDBC_PASSWORD:password"
   driverClassName: "org.postgresql.Driver"
+customAi:
+  themePromptStrategy: "$THEME_PROMPT:custom_name_and_description"
+  taskPromptStrategy: "$TASK_PROMPT:custom_name_and_content"
+  themePromptFile: "$THEME_PROMPT_FILE:sample-data/theme_prompt.txt"
+  taskPromptFile: "$TASK_PROMPT_FILE:sample-data/task_prompt.txt"

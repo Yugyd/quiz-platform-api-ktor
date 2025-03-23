@@ -52,7 +52,8 @@ internal class YandexGptClientImpl(
             maxTokens = YandexGptConfigs.MAX_TOKEN,
         )
         val request = CompletionRequest(
-            modelUri = "gpt://${yandexAiKeys.apiFolder}/yandexgpt/latest",
+            // https://yandex.cloud/ru/docs/foundation-models/concepts/yandexgpt/models
+            modelUri = "gpt://${yandexAiKeys.apiFolder}/yandexgpt-lite/latest",
             completionOptions = completionOptions,
             messages = listOf(
                 MessageDao(
@@ -84,4 +85,3 @@ internal class YandexGptClientImpl(
         private const val COMPLETIONS_API_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
     }
 }
-

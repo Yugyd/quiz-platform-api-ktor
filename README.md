@@ -16,7 +16,7 @@ Quiz Platform is a Open Source knowledge testing platform for mobile apps.
 * Architecture: Clean
 * Threading: Coroutines + Flow
 * DI: Koin
-* DB: Exposed
+* DB: Exposed, PostgreSQL
 * Logging: Logback
 * Testing: JUnit, Mockk
 
@@ -36,74 +36,107 @@ Quiz Platform is a Open Source knowledge testing platform for mobile apps.
 
 # Deploy docker image
 
-## Step 1: Install Ubuntu with Docker and JDK on your server.
+### Step 1: Install Ubuntu with Docker and JDK on your server.
 
-## Step 2: Build docker image.
+### Step 2: Build docker image.
 
 - `./gradlew buildImage` - build docker image.
 
-## Step 3: Connect to your server via SSH.
+### Step 3: Connect to your server via SSH.
 
 - `ssh user@your-server-ip`
 
-## Step 4: Upload the docker image to your server using SCP.
+### Step 4: Upload the docker image to your server using SCP.
 
 - `scp /home/user/jib-image.tar user@your-server-ip:/home/user` - upload the image.
 
-## Step 5: Load the docker image on your server.
+### Step 5: Load the docker image on your server.
 
 - `docker load < /home/user/jib-image.tar` - load the image.
 - `docker images` - check the image.
 
-## Step 6: Run the docker image on your server.
+### Step 6: Run the docker image on your server.
 
-- `docker run -p 8080:8080 -t quiz-platform:your_semiversion` - run the container.
+- `docker run -e DB_JDBC_URL="REPLACE" -e DB_JDBC_USER="REPLACE" -e DB_JDBC_PASSWORD="REPLACE" -e THEME_PROMPT_FILE="REPLACE" -e TASK_PROMPT_FILE="REPLACE" -p 8080:8080 -t quiz-platform:your_semiversion` -
+run the container. Use `-d` instead of `t` to run in detached mode.
 - `docker ps` - check the container.
 
-## Step 7: Configure Nginx as a Reverse Proxy
+### Step 7: Configure Nginx as a Reverse Proxy
 
-Read special documentation.
-
-### Install Nginx
+#### Step 7.1: Install Nginx
 
 - `sudo apt update` - update apt.
 - `sudo apt install nginx -y` - install Nginx.
 
-### Configure Nginx
+#### Step 7.2: Configure Nginx
+
+[Read Nginx documentation](https://nginx.org/en/docs/beginners_guide.html)
+
+Example commands:
 
 - `sudo nano /etc/nginx/sites-available/yourdomain.com`
 
-### Update apt
+#### Step 7.3: Install and configure firewall on Ubuntu using UFW
 
-- `apt update`
+[Read UFW documentation](https://help.ubuntu.com/community/UFW).
 
-### Install and configure firewall on Ubuntu using UFW
+#### Step 7.4: Start and enable Nginx on Ubuntu
 
-### Install Nginx on Ubuntu
+[Read Nginx documentation](https://nginx.org/en/docs/beginners_guide.html)
 
-- `apt install nginx`
+Example commands:
+
 - `systemctl start nginx`
 - `systemctl enable nginx`
 - `systemctl status nginx`
 - `ufw allow 'Nginx HTTP'` - if you haven't done it before
 - `ufw status` - if you haven't done it before
 - `systemctl reload nginx`
-- `nano /etc/nginx/sites-available/yourdomain.com`
 
-Read special documentation.
+### Step 8: Start and fill the database based on PostgreSQL
 
-## Step 8: Start and fill the database based on PostgreSQL
+[Read special section](#database-setup-for-development-macos).
 
-Read special documentation.
+# Update docker image
 
-# Database setup for development
+### Step 1: Connect to your server via SSH.
 
-## Install and start PostgreSQL on macOS
+- `ssh user@your-server-ip`
+
+### Step 2: Upload the docker image to your server using SCP.
+
+- `scp /home/user/jib-image.tar user@your-server-ip:/home/user` - upload the image.
+
+### Step 3: Load the docker image on your server.
+
+- `docker load < /home/user/jib-image.tar` - load the image.
+- `docker images` - check the image.
+
+### Step 4: Stop and Remove the Old Container (if running)
+
+- `docker ps`
+- `docker stop <container_name_or_id>` - `container_name_or_id` is the name or ID of the running container.
+- `docker rm <container_name_or_id>` - `container_name_or_id` is the name or ID of the stopped container.
+
+### Step 6: Run the docker image on your server.
+
+- `docker run -e DB_JDBC_URL="REPLACE" -e DB_JDBC_USER="REPLACE" -e DB_JDBC_PASSWORD="REPLACE" -e THEME_PROMPT_FILE="REPLACE" -e TASK_PROMPT_FILE="REPLACE" -p 8080:8080 -t quiz-platform:your_semiversion` -
+run the container. Use `-d` instead of `t` to run in detached mode.
+- `docker ps` - check the container.
+
+### Step 7: Clean up old images (Optional)
+
+- `docker images` - check the images.
+- `docker rmi <image_name_or_id>` - `image_name_or_id` is the name or ID of the old image you want to remove.
+
+# Database setup for development (macOS)
+
+### Step 1: Install and start PostgreSQL
 
 - `brew install postgresql`
 - `brew services start postgresql`
 
-## Set up PostgreSQL Database
+### Step 2: Set up PostgreSQL
 
 - `psql postgres` - Switch to the PostgreSQL user
 - `CREATE DATABASE themes;` - Create a new database
@@ -111,69 +144,39 @@ Read special documentation.
 - `GRANT ALL PRIVILEGES ON DATABASE themes TO postgres;` - Grant privileges to the user
 - `\q` - Exit the PostgreSQL terminal
 
-## Configure PostgreSQL in IntelliJ IDEA Ultimate
+### Step 3: Configure PostgreSQL in IntelliJ IDEA Ultimate
 
 - Open the Database window.
 - Click the + sign and choose Data Source → PostgreSQL.
 - In the Data Source Properties dialog, specify the data source name and the database connection settings.
 
-## Create tables
+### Step 4: Create tables
 
-### Create the themes Table
+[Run Create the themes Table](sample-data/create_themes_table.sql)
 
-```sql
-CREATE TABLE themes
-(
-    id                      SERIAL PRIMARY KEY,
-    alias_code              TEXT    NOT NULL,
-    name                    TEXT    NOT NULL,
-    description             TEXT    NOT NULL,
-    alternative_description TEXT,
-    icon_url                TEXT,
-    is_final                BOOLEAN NOT NULL DEFAULT FALSE,
-    parent_id               INTEGER,
-    FOREIGN KEY (parent_id) REFERENCES themes (id) ON DELETE CASCADE
-);
-```
+[Insert Sample Data](sample-data/generate_sample_themes.sql)
 
-### Insert Sample Data
-
-```sql
-INSERT INTO themes (alias_code, name, description, alternative_description, icon_url, is_final, parent_id)
-VALUES ('theme1', 'Example Theme', 'This is an example theme.', 'An alternative description',
-        'http://example.com/icon.png', FALSE, NULL),
-       ('theme2', 'Example Theme', 'This is an example theme.', 'An alternative description',
-        'http://example.com/icon.png', TRUE, 1),
-       ('theme3', 'Example Theme', 'This is an example theme.', 'An alternative description',
-        'http://example.com/icon.png', TRUE, 2);
-```
-
-## Stop PostgreSQL
+### Step 5: Stop PostgreSQL after use
 
 - `brew services stop postgresql`
 
-# Pre-filled Data
+# Database setup for production (Ubuntu)
 
-## Step 1: Create a SQL script with your initial data, for example, data.sql
+### Step 1: Install and configure PostgreSQL on Ubuntu
 
-```sql
--- data.sql
-INSERT INTO themes (alias_code, name, description, alternative_description, icon_url, is_final, parent_id)
-VALUES ('theme1', 'Nature', 'A theme about nature', 'Green and serene', 'http://example.com/nature-icon.png', TRUE,
-        NULL),
-       ('theme2', 'Technology', 'A theme about technology', 'Innovative and cutting-edge',
-        'http://example.com/tech-icon.png', FALSE, NULL),
-       ('theme3', 'Space', 'A theme about outer space', 'Mysterious and vast', 'http://example.com/space-icon.png',
-        TRUE, 2);
-```
+[Read PostgreSQL documentation](https://documentation.ubuntu.com/server/how-to/databases/install-postgresql/index.html)
 
-## Step 2: Place the SQL Script in the Resources Directory
+[Read Database setup for development](#database-setup-for-development-macos)
 
-Place the data.sql script inside your resources folder in your Ktor project.
+### Step 2: Create tables
 
-# Use release configuration file for production
+[Run Create the themes Table](sample-data/create_themes_table.sql)
 
-https://ktor.io/docs/server-configuration-file.html#command-line
+### Step 3: Fill database with real data
+
+#### For example, you can run predefined SQL scripts to fill the database:
+
+[Insert Sample Data](sample-data/generate_sample_themes.sql)
 
 # License
 

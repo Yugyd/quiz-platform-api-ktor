@@ -14,7 +14,7 @@ internal class AiResponseToTasksMapperImpl(
         val startTasksBlockIndex = aiResponseJson.indexOf("[")
         val endTasksBlockIndex = aiResponseJson.lastIndexOf("]")
 
-        require(startTasksBlockIndex == -1 || endTasksBlockIndex == -1) {
+        require(startTasksBlockIndex != -1 && endTasksBlockIndex != -1) {
             "Tasks block not found in response"
         }
 
@@ -32,7 +32,7 @@ internal class AiResponseToTasksMapperImpl(
         val startTaskVerificationBlockIndex = aiResponseJson.indexOf("{")
         val endTaskVerificationBlockIndex = aiResponseJson.lastIndexOf("}")
 
-        require(startTaskVerificationBlockIndex == -1 || endTaskVerificationBlockIndex == -1) {
+        require(startTaskVerificationBlockIndex != -1 && endTaskVerificationBlockIndex != -1) {
             "Task verification block not found in response"
         }
 

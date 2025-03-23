@@ -1,4 +1,4 @@
-package com.yugyd.quiz.data.ai.prompts
+package com.yugyd.quiz.data.ai.prompts.strategy.tasks
 
 import com.yugyd.quiz.domain.ai.prompt.TasksVerificationPromptStrategy
 import com.yugyd.quiz.domain.tasks.models.verification.TasksVerificationRequestModel

@@ -29,9 +29,9 @@ internal fun Application.configureDi() {
             themesDomainModule,
             tasksDataModule,
             tasksDomainModule,
-            promptModule,
+            promptModule(environment.config),
             yandexGptModule,
-            aiDataModule,
+            aiDataModule(environment.config),
             aiDomainModule,
         )
     }

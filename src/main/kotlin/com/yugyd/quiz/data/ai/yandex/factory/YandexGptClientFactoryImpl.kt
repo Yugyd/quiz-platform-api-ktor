@@ -1,7 +1,8 @@
 package com.yugyd.quiz.data.ai.yandex.factory
 
 import com.yugyd.quiz.data.ai.AiClient
-import com.yugyd.quiz.data.ai.yandex.AiHttpClientConfig
+import com.yugyd.quiz.data.ai.AiClientFactory
+import com.yugyd.quiz.data.ai.core.AiHttpClientConfig
 import com.yugyd.quiz.data.ai.yandex.YandexGptClientImpl
 import com.yugyd.quiz.data.ai.yandex.config.YandexAiKeys
 import com.yugyd.quiz.data.themes.AiInitialException
@@ -11,7 +12,7 @@ import kotlinx.serialization.json.Json
 internal class YandexGptClientFactoryImpl(
     private val json: Json,
     private val aiHttpClientConfig: AiHttpClientConfig?,
-) : YandexGptClientFactory {
+) : AiClientFactory {
 
     override fun create(aiKeys: AiKeysModel?): AiClient {
         if (aiKeys == null) {
@@ -25,6 +26,7 @@ internal class YandexGptClientFactoryImpl(
         val yandexAiKeys = YandexAiKeys(
             apiKey = aiKeys.apiKey,
             apiFolder = aiKeys.apiFolder,
+            aiModel = aiKeys.aiModel,
         )
         return YandexGptClientImpl(
             yandexAiKeys = yandexAiKeys,

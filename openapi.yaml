@@ -42,6 +42,7 @@ paths:
         - $ref: '#/components/parameters/X-Ai-Key'
         - $ref: '#/components/parameters/X-Ai-Folder'
         - $ref: '#/components/parameters/X-Ai-Provider'
+        - $ref: '#/components/parameters/X-Ai-Model'
       responses:
         '200':
           description: successful operation
@@ -78,6 +79,7 @@ paths:
         - $ref: '#/components/parameters/X-Ai-Key'
         - $ref: '#/components/parameters/X-Ai-Folder'
         - $ref: '#/components/parameters/X-Ai-Provider'
+        - $ref: '#/components/parameters/X-Ai-Model'
       requestBody:
         content:
           application/json:
@@ -161,6 +163,7 @@ paths:
         - $ref: '#/components/parameters/X-Ai-Key'
         - $ref: '#/components/parameters/X-Ai-Folder'
         - $ref: '#/components/parameters/X-Ai-Provider'
+        - $ref: '#/components/parameters/X-Ai-Model'
       responses:
         '200':
           description: successful operation
@@ -268,6 +271,13 @@ components:
         enum:
           - yandex
           - openai
+    X-Ai-Model:
+      name: X-Ai-Model
+      in: header
+      description: 'The model of the AI.'
+      required: false
+      schema:
+        type: string
     SchemaVersion:
       name: schemaVersion
       in: path

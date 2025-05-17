@@ -11,6 +11,7 @@ storage:
   password: "$DB_JDBC_PASSWORD:password"
   driverClassName: "org.postgresql.Driver"
 customAi:
+  useLegacyChatGptCompletionsApi: true
   themePromptStrategy: "$THEME_PROMPT:custom_name_and_description"
   taskPromptStrategy: "$TASK_PROMPT:custom_name_and_content"
   themePromptFile: "$THEME_PROMPT_FILE:sample-data/theme_prompt.txt"

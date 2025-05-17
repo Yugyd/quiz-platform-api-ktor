@@ -6,6 +6,7 @@ import com.yugyd.quiz.core.loggerCoreModule
 import com.yugyd.quiz.core.serializationCoreModule
 import com.yugyd.quiz.core.toggles.togglesCoreModule
 import com.yugyd.quiz.data.ai.aiDataModule
+import com.yugyd.quiz.data.ai.chatgpt.chatGptModule
 import com.yugyd.quiz.data.ai.prompts.promptModule
 import com.yugyd.quiz.data.ai.yandex.yandexGptModule
 import com.yugyd.quiz.data.tasks.tasksDataModule
@@ -31,6 +32,7 @@ internal fun Application.configureDi() {
             tasksDomainModule,
             promptModule(environment.config),
             yandexGptModule,
+            chatGptModule(environment.config),
             aiDataModule(environment.config),
             aiDomainModule,
         )

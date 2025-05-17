@@ -34,3 +34,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Producation sample data
+/sample-data/prod/

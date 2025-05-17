@@ -10,9 +10,15 @@ internal class AiKeysFactoryImpl : AiKeysFactory {
     override fun create(aiAuthModel: AiAuthModel): AiKeysModel? {
         val aiKeys: AiKeysModel? = if (
             !aiAuthModel.aiKey.isNullOrEmpty() &&
-            !aiAuthModel.aiFolder.isNullOrEmpty() &&
             !aiAuthModel.aiProvider.isNullOrEmpty()
         ) {
+            if (
+                aiAuthModel.aiProvider == AiProvider.YANDEX.serverValue &&
+                aiAuthModel.aiFolder.isNullOrEmpty()
+            ) {
+                return null
+            }
+
             val aiProvider = AiProvider.entries.firstOrNull {
                 aiAuthModel.aiProvider == it.serverValue
             } ?: throw AiInitialException("Invalid AI provider")
@@ -21,6 +27,7 @@ internal class AiKeysFactoryImpl : AiKeysFactory {
                 apiKey = aiAuthModel.aiKey,
                 apiFolder = aiAuthModel.aiFolder,
                 provider = aiProvider,
+                aiModel = aiAuthModel.aiModel,
             )
         } else {
             null

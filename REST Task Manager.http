@@ -6,7 +6,8 @@ Accept: application/json
 Content-Type: application/json
 X-Ai-Key: REPLACE_ME
 X-Ai-Folder: REPLACE_ME
-X-Ai-Provider: yandex
+X-Ai-Provider: openai
+X-Ai-Model: gpt-4.1-nano
 
 ###
 POST http://0.0.0.0:8080/tasks/verification
@@ -14,7 +15,8 @@ Accept: application/json
 Content-Type: application/json
 X-Ai-Key: REPLACE_ME
 X-Ai-Folder: REPLACE_ME
-X-Ai-Provider: yandex
+X-Ai-Provider: openai
+X-Ai-Model: gpt-4.1-nano
 
 {
   "quest": "What is the capital of France??",
@@ -42,7 +44,8 @@ Accept: application/json
 Content-Type: application/json
 X-Ai-Key: REPLACE_ME
 X-Ai-Folder: REPLACE_ME
-X-Ai-Provider: yandex
+X-Ai-Provider: openai
+X-Ai-Model: gpt-4.1-nano
 
 ###
 GET http://0.0.0.0:8080/themes/{{themeId}}?recreate=true
@@ -50,4 +53,5 @@ Accept: application/json
 Content-Type: application/json
 X-Ai-Key: REPLACE_ME
 X-Ai-Folder: REPLACE_ME
-X-Ai-Provider: yandex
+X-Ai-Provider: openai
+X-Ai-Model: gpt-4.1-nano

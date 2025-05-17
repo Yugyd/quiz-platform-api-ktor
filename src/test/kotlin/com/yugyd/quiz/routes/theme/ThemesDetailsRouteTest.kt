@@ -39,6 +39,7 @@ class ThemesDetailsRouteTest : KoinTest {
         apiKey = "Key",
         apiFolder = "Folder",
         provider = AiProvider.YANDEX,
+        aiModel = null,
     )
     private val testThemeId = 1
     private val testThemeDetail = ThemeDetailModel(

@@ -1,4 +1,4 @@
-package com.yugyd.quiz.data.ai.yandex
+package com.yugyd.quiz.data.ai.core
 
 internal data class AiHttpClientConfig(
     val keepAliveTime: Long,

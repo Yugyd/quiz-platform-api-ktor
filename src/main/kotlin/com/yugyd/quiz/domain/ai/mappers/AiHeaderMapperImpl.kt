@@ -11,6 +11,7 @@ internal class AiHeaderMapperImpl : AiHeaderMapper {
             aiKey = headers[AiHeaders.KEY_HEADER],
             aiFolder = headers[AiHeaders.FOLDER_HEADER],
             aiProvider = headers[AiHeaders.PROVIDER_HEADER],
+            aiModel = headers[AiHeaders.MODEL_HEADER],
         )
     }
 }

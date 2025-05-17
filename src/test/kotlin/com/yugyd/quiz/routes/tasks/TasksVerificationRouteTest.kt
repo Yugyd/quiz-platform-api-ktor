@@ -47,6 +47,7 @@ class TasksVerificationRouteTest : KoinTest {
         apiKey = "Key",
         apiFolder = "Folder",
         provider = AiProvider.YANDEX,
+        aiModel = null,
     )
     private val testVerificationTaskResponse = TaskVerificationModel(
         isCorrect = true,
